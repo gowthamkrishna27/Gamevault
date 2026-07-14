@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Key, User, ArrowRight } from 'lucide-react'
+import { Key, User, ArrowRight, Sparkles } from 'lucide-react'
 
 interface LoginViewProps {
   onLoginSuccess: (token: string, username: string) => void
@@ -131,6 +131,23 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
             {!isLoading && <ArrowRight size={16} />}
           </button>
         </form>
+
+        {/* Divider */}
+        <div className="relative flex py-1 items-center">
+          <div className="flex-grow border-t border-foreground/10"></div>
+          <span className="flex-shrink mx-4 text-xs text-foreground/40 font-semibold uppercase tracking-widest">or</span>
+          <div className="flex-grow border-t border-foreground/10"></div>
+        </div>
+
+        {/* Bypass Button */}
+        <button
+          type="button"
+          onClick={() => onLoginSuccess('demo-token', 'Demo User')}
+          className="w-full py-3 text-sm font-bold flex items-center justify-center gap-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 hover:border-foreground/20 text-foreground transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer"
+        >
+          <Sparkles size={16} className="text-amber-500 animate-pulse" />
+          <span>Bypass Login (Demo Mode)</span>
+        </button>
 
         {/* Footer toggling */}
         <div className="text-center pt-2 border-t border-foreground/10 text-sm">

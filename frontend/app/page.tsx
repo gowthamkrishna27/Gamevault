@@ -42,6 +42,33 @@ export default function Page() {
     if (!token) return
 
     async function fetchGames() {
+      if (token === 'demo-token') {
+        setIsLoading(true)
+        setError(null)
+        try {
+          const stored = localStorage.getItem('demo-games')
+          if (stored) {
+            setGames(JSON.parse(stored))
+          } else {
+            const seedGames = [
+              { id: 'demo-1', title: 'The Legend of Zelda: Tears of the Kingdom', platform: 'Nintendo Switch', completed: true },
+              { id: 'demo-2', title: 'Elden Ring', platform: 'PlayStation 5', completed: true },
+              { id: 'demo-3', title: 'Cyberpunk 2077', platform: 'PC', completed: false },
+              { id: 'demo-4', title: 'Hades II', platform: 'PC', completed: false },
+              { id: 'demo-5', title: 'Super Mario Odyssey', platform: 'Nintendo Switch', completed: true },
+            ]
+            setGames(seedGames)
+            localStorage.setItem('demo-games', JSON.stringify(seedGames))
+          }
+        } catch (err) {
+          console.error(err)
+          setError('Failed to load demo games.')
+        } finally {
+          setIsLoading(false)
+        }
+        return
+      }
+
       setIsLoading(true)
       setError(null)
       try {
@@ -88,6 +115,23 @@ export default function Page() {
 
   const handleAddGame = async (newGameData: { id: string; title: string; platform: string; completed: boolean }) => {
     if (!token) return
+
+    if (token === 'demo-token') {
+      const { title, platform, completed } = newGameData
+      const createdGame = {
+        id: `demo-${Date.now()}`,
+        title,
+        platform,
+        completed
+      }
+      setGames((prevGames) => {
+        const updated = [createdGame, ...prevGames]
+        localStorage.setItem('demo-games', JSON.stringify(updated))
+        return updated
+      })
+      return
+    }
+
     try {
       const { title, platform, completed } = newGameData
       const response = await fetch(`${API_URL}/api/games`, {
@@ -118,6 +162,16 @@ export default function Page() {
 
   const handleDeleteGame = async (id: string) => {
     if (!token) return
+
+    if (token === 'demo-token') {
+      setGames((prevGames) => {
+        const updated = prevGames.filter((game) => game.id !== id)
+        localStorage.setItem('demo-games', JSON.stringify(updated))
+        return updated
+      })
+      return
+    }
+
     try {
       const response = await fetch(`${API_URL}/api/games/${id}`, {
         method: 'DELETE',
@@ -151,6 +205,17 @@ export default function Page() {
 
   const handleUpdateGame = async (id: string, updatedFields: Omit<Game, 'id'>) => {
     if (!token) return
+
+    if (token === 'demo-token') {
+      const updatedGame = { id, ...updatedFields }
+      setGames((prevGames) => {
+        const updated = prevGames.map((game) => (game.id === id ? updatedGame : game))
+        localStorage.setItem('demo-games', JSON.stringify(updated))
+        return updated
+      })
+      return
+    }
+
     try {
       const response = await fetch(`${API_URL}/api/games/${id}`, {
         method: 'PUT',
